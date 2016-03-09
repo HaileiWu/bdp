@@ -15,7 +15,9 @@ rsac = RSAC()
 
 message = rsac.encrypt(message)
 
-message = '49e63b5522a54080a038bcb60ce0f9050301111bbd79975af244a26f792d5983097cfdb9f359401d308de762ab6363e28cac41428dbe26599878d124c2950dd77dc2144b7a75ba0c1a6b41ef7a5e11c45c596e3748392ee45f764b3d12b5c55ea6e93f794ec785fc0315797828c09d5f9bdadae054437d575092789811713a6901eb97394ccb984d9a6e88833b174e2782814ddb98a0665216df7da75199c19095ee'.decode('hex')
+message = '49e63b5522a54080a038bcb60ce0f9050301111bbd79975af244a26f792d5983097cfdb9f359401d308de762ab6363e28cac41428dbe26599878d124c2950dd77dc2144b7a75ba0c1a6b41ef7a5e11c45c596e3748392ee45f764b3d12b5c55ea6e93f794ec785fc0315797828c09d5f9bdadae054437d575092789811713a6901eb97394ccb984d9a6e88833b174e2782814ddb98a0665216df7da75199c19095ee'
+
+print message
 
 messages = [ message ]
 
@@ -43,7 +45,6 @@ for message in messages:
     # Read responses on both sockets
     for s in socks:
         data = s.recv(1024)
-        data = AESC(key).decrypt(data)
         print >>sys.stderr, '%s: received "%s"' % (s.getsockname(), data)
         if not data:
             print >>sys.stderr, 'closing socket', s.getsockname()

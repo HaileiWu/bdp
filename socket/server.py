@@ -4,6 +4,7 @@ import socket
 import sys
 import Queue
 import json
+import traceback
 
 from crypt import AESC, RSAC, RNC
 
@@ -36,10 +37,12 @@ class AuthorizeServer(object):
         
         data = data[0:16]
 
+        print data
+
         key = data.encoding('hex')
 
         body = data[16:]
-        
+
         print data 
         print key 
         print body
@@ -130,7 +133,7 @@ class AuthorizeServer(object):
                     # Remove message queue
                     del self.message_queues[s]
             except Exception, e:
-                print e
+                print traceback.format_exc()
 
 
 if __name__ == '__main__':
