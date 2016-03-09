@@ -5,6 +5,7 @@ import sys
 import Queue
 import json
 import traceback
+import binascii
 
 from crypt import AESC, RSAC, RNC
 
@@ -34,22 +35,15 @@ class AuthorizeServer(object):
 
     def handle(self, data):
         """ 处理请求 """
-        
-        data = data[0:16]
 
-        print data
-
-        key = data.encoding('hex')
+        key = binascii.b2a_hex(data[0:16]).upper()
 
         body = data[16:]
-
-        print data 
-        print key 
-        print body
 
         # RN解密
         rnc = RNC(key)
         data = rnc.decrypt(body)
+
         data = json.loads(data)
         
         usr = data['usr']
