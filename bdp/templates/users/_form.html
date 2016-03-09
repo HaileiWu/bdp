@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block body %}
+	<h4 class="page-header">{{ page_header }}</h4>
+	<div class="col-md-6">
+		{% if user.lc_user.id %}
+		<form action="{{ url_for('user.update', user_id=user.id) }}" method="POST">
+		{% else %}
+		<form action="{{ url_for('user.create') }}" method="POST" data-toggle="validator">
+		{% endif %}
+			<div class="form-group">
+				<label for="">用户名</label>
+				<input type="text" class="form-control" name="username" placeholder="" value="{{ user.username }}" required>
+			</div>
+			
+			<div class="form-group">
+				<label for="">昵称</label>
+				<input type="text" class="form-control" name="nickname" placeholder="" value="{{ user.nickname }}" required>
+			</div>
+
+			<button class="btn btn-primary" type="submit">提交</button>
+		</form>
+	</div>
+{% endblock %}

@@ -2,10 +2,12 @@
 import os
 import rsa
 import json
+import rncryptor
 
 from Crypto.Cipher import AES
 from Crypto import Random
 from binascii import b2a_hex, a2b_hex
+
 
 class AESC():
 	""" aes加密 """
@@ -62,15 +64,37 @@ class RSAC(object):
 		text = rsa.decrypt(cipher_text, self.prikey)
 		return text
 
+class RNC(object):
+	"""rn加密"""
+
+	def __init__(self, key):
+		""""""
+		self.key = key
+		self.cryptor = rncryptor.RNCryptor()
+
+	def encrypt(self, text):
+		""" 加密 """
+		cipher_text = self.cryptor.encrypt(text, self.key)
+		return cipher_text
+
+	def decrypt(self, cipher_text):
+		""" 解密 """
+		text = self.cryptor.decrypt(cipher_text, self.key)
+		return text
 
 if __name__ == '__main__':
-	aesc = AESC('k'*16)
-	cipher_text = aesc.encrypt('i love beijing')
-	print cipher_text
-	print aesc.decrypt(cipher_text)
+	# aesc = AESC('k'*16)
+	# cipher_text = aesc.encrypt('i love beijing')
+	# print cipher_text
+	# print aesc.decrypt(cipher_text)
 
-	rsac = RSAC()
-	cipher_text = rsac.encrypt('i love beijing')
-	print rsac.decrypt(cipher_text)
+	# rsac = RSAC()
+	# cipher_text = rsac.encrypt('i love beijing')
+	# print rsac.decrypt(cipher_text)
+
+	rnc = RNC('m'*16)
+
+	cipher_text = rnc.encrypt('i love beijing')
+	print rnc.decrypt(cipher_text)
 
 

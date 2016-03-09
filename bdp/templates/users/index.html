@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+{% block body %}
+	<h4 class="page-header">用户列表</h4>
+	<a href="{{ url_for('user.new') }}" class="btn btn-primary btn-sm pull-right" style="margin-bottom: 5px;">创建用户</a>
+	<table class="table table-bordered">
+		<thead>
+			<tr>
+				<th></th>
+				<th>用户名</th>
+				<th>昵称</th>
+				<th>角色</th>
+				<th>状态</th>
+				<th>创建时间</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for user in users %}
+				<tr>
+					<td>{{ loop.index }}</td>
+					<td>{{ user.get('username') }}</td>
+					<td>{{ user.get('nickname') }}</td>
+					<td></td>
+					<td>
+						{% if user.get('enable') %}
+						可用
+						{% else %}
+						不可用
+						{% endif %}
+					</td>
+					<td>{{ user.created_at.strftime("%Y-%m-%d %H:%M:%S") }}</td>
+					<td>
+						<!-- <a class="btn btn-primary btn-xs"></a> -->
+						<a class="btn btn-primary btn-xs" href="{{ url_for('user.edit', user_id=user.id) }}">编辑</a>
+						<a class="btn btn-danger btn-xs" href="{{ url_for('user.delete', user_id=user.id) }}">删除</a>
+					</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+{% endblock %}

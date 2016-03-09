@@ -5,7 +5,7 @@ import sys
 import Queue
 import json
 
-from crypt import AESC, RSAC
+from crypt import AESC, RSAC, RNC
 
 class AuthorizeServer(object):
     """ Use for authorize """
@@ -34,94 +34,103 @@ class AuthorizeServer(object):
     def handle(self, data):
         """ 处理请求 """
         
-        # RSA解密
-        rsac = RSAC()
-        data = rsac.decrypt(data)
+        data = data[0:16]
+
+        key = data.encoding('hex')
+
+        body = data[16:]
+        
+        print data 
+        print key 
+        print body
+
+        # RN解密
+        rnc = RNC(key)
+        data = rnc.decrypt(body)
         data = json.loads(data)
         
-        key = data['ck']
         usr = data['usr']
         udid = data['udid']
         
-        # 1、获取uuid、webchat
 
         # 2、查询mongo
         response = 'this is response data.'
-        aesc = AESC(key)
-        cipher_text = aesc.encrypt(response)
+        cipher_text = rnc.encrypt(response)
         return cipher_text
 
 
     def run(self):
         """ start server """
         while self.inputs:
+            try:
+                # 阻塞等待处理的sockets
+                print >>sys.stderr, '\nwaiting for the next event'
+                readable, writable, exceptional = select.select(self.inputs, self.outputs, self.inputs)
 
-            # 阻塞等待处理的sockets
-            print >>sys.stderr, '\nwaiting for the next event'
-            readable, writable, exceptional = select.select(self.inputs, self.outputs, self.inputs)
+                # 处理输入
+                for s in readable:
 
-            # 处理输入
-            for s in readable:
+                    if s is self.server:
+                        # A "readable" server socket is ready to accept a connection
+                        connection, client_address = s.accept()
+                        print >>sys.stderr, 'new connection from', client_address
+                        connection.setblocking(0)
+                        self.inputs.append(connection)
 
-                if s is self.server:
-                    # A "readable" server socket is ready to accept a connection
-                    connection, client_address = s.accept()
-                    print >>sys.stderr, 'new connection from', client_address
-                    connection.setblocking(0)
-                    self.inputs.append(connection)
-
-                    # Give the connection a queue for data we want to send
-                    self.message_queues[connection] = Queue.Queue()
-
-                else:
-                    data = s.recv(1024)
-                    if data:
-                        # A readable client socket has data
-                        print >>sys.stderr, 'received "%s" from %s' % (data, s.getpeername())
-
-                        # handle request data
-                        data = self.handle(data)
-
-                        self.message_queues[s].put(data)
-                        # Add output channel for response
-                        if s not in self.outputs:
-                            self.outputs.append(s)
+                        # Give the connection a queue for data we want to send
+                        self.message_queues[connection] = Queue.Queue()
 
                     else:
-                        # Interpret empty result as closed connection
-                        print >>sys.stderr, 'closing', client_address, 'after reading no data'
-                        # Stop listening for input on the connection
-                        if s in self.outputs:
-                            self.outputs.remove(s)
-                        self.inputs.remove(s)
-                        s.close()
+                        data = s.recv(1024)
+                        if data:
+                            # A readable client socket has data
+                            print >>sys.stderr, 'received "%s" from %s' % (data, s.getpeername())
 
-                        # Remove message queue
-                        del self.message_queues[s]
+                            # handle request data
+                            data = self.handle(data)
 
-            # Handle outputs
-            for s in writable:
-                try:
-                    next_msg = self.message_queues[s].get_nowait()
-                except Queue.Empty:
-                    # No messages waiting so stop checking for writability.
-                    print >>sys.stderr, 'output queue for', s.getpeername(), 'is empty'
-                    self.outputs.remove(s)
-                else:
-                    print >>sys.stderr, 'sending "%s" to %s' % (next_msg, s.getpeername())
-                    s.send(next_msg)
+                            self.message_queues[s].put(data)
+                            # Add output channel for response
+                            if s not in self.outputs:
+                                self.outputs.append(s)
 
-            # Handle "exceptional conditions"
-            for s in exceptional:
-                print >>sys.stderr, 'handling exceptional condition for', s.getpeername()
-                # Stop listening for input on the connection
-                self.inputs.remove(s)
-                if s in self.outputs:
-                    self.outputs.remove(s)
-                s.close()
+                        else:
+                            # Interpret empty result as closed connection
+                            print >>sys.stderr, 'closing', client_address, 'after reading no data'
+                            # Stop listening for input on the connection
+                            if s in self.outputs:
+                                self.outputs.remove(s)
+                            self.inputs.remove(s)
+                            s.close()
 
-                # Remove message queue
-                del self.message_queues[s]
+                            # Remove message queue
+                            del self.message_queues[s]
+
+                # Handle outputs
+                for s in writable:
+                    try:
+                        next_msg = self.message_queues[s].get_nowait()
+                    except Queue.Empty:
+                        # No messages waiting so stop checking for writability.
+                        print >>sys.stderr, 'output queue for', s.getpeername(), 'is empty'
+                        self.outputs.remove(s)
+                    else:
+                        print >>sys.stderr, 'sending "%s" to %s' % (next_msg, s.getpeername())
+                        s.send(next_msg)
+
+                # Handle "exceptional conditions"
+                for s in exceptional:
+                    print >>sys.stderr, 'handling exceptional condition for', s.getpeername()
+                    # Stop listening for input on the connection
+                    self.inputs.remove(s)
+                    if s in self.outputs:
+                        self.outputs.remove(s)
+                    s.close()
+
+                    # Remove message queue
+                    del self.message_queues[s]
+            except Exception, e:
+                print e
 
 
 if __name__ == '__main__':

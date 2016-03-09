@@ -25,74 +25,12 @@
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 					</button>
-					<a class="navbar-brand" href="#">Camelia山茶花</a>
+					<a class="navbar-brand" href="#">管理平台</a>
 				</div>
                 <div id="navbar" class="navbar-collapse collapse">
                     <ul class="nav navbar-nav navbar-right">
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">文章管理 <span class="caret"></span></a>
-                            <ul class="dropdown-menu">
-                                <li><a href="{{ url_for('article.index') }}">我的文章</a></li>
-                                <li><a href="{{ url_for('article.new') }}">写文章</a></li>
-                                
-                                {% if current_user.role.get('name') != 'editor' %}
-                                    <li><a href="{{ url_for('article.audit_index') }}">文章审核</a></li>
-                                {% endif %}
-                                <li><a href="{{ url_for('article.published') }}">已发布文章</a></li>
-                                <li><a href="">#回收站</a></li>
-                                <li><a href="{{ url_for('article_category.index') }}">分类目录</a></li>
-                                <li><a href="">#数据分析</a></li>
-                            </ul>
-                        </li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">单品管理 <span class="caret"></span></a>
-                            <ul class="dropdown-menu">
-                                <li><a href="{{ url_for('spider.index') }}">产品库</a></li>
-                                <li><a href="{{ url_for('camelia.index') }}">山茶花产品</a></li>
-                                <li><a href="{{ url_for('camelia.recommend') }}">我的推荐</a></li>
-                                <li><a href="{{ url_for('spider.stars') }}" target="_blank">我的收藏</a></li>
-                                <li><a href="{{ url_for('product_category.index') }}">分类目录</a></li>
-                                <li><a href="{{ url_for('product_tag.index') }}">标签目录</a></li>
-                                <li><a href="{{ url_for('product_source.index') }}">电商目录</a></li>
-                                <li><a href="{{ url_for('product_brand.index') }}">品牌目录</a></li>
-                                <li><a href="{{ url_for('product_scene.index') }}">场景目录</a></li>
-                                <li><a href="{{ url_for('search_key.index') }}">关键字目录</a></li>
-                                <li><a href="">#数据分析</a></li>
-                            </ul>
-                        </li>
-                        {% if current_user.role.get('group') == 'customerService' or current_user.role.get('name') == 'sudoer' %}
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">订单管理 <span class="caret"></span></a>
-                            <ul class="dropdown-menu">
-                                <li><a href="{{ url_for('order.unpaid_index') }}">待付款订单</a></li>
-                                <li><a href="{{ url_for('order.paid_index') }}">未处理订单</a></li>
-                                <li><a href="{{ url_for('order.processing_index') }}">进行中订单</a></li>
-                                <li><a href="{{ url_for('order.finished_index') }}">已完成订单</a></li>
-                                <li><a href="">退货</a></li>
-                            </ul>
-                        </li>
-                        {% endif %}
-                        
-                        <li><a href="#"><i class="fa fa-star"></i></a><span id="star-count"></span></li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ current_user.email }} <span class="caret"></span></a>
-                            <ul class="dropdown-menu">
-                                {% if current_user.role.get('name') in ['chiefEditor', 'CustomerServiceManager', 'OperationManager', 'sudoer'] %}
-                                <li><a href="{{ url_for('rate.index') }}">汇率管理</a></li>
-                                <li><a href="{{ url_for('user.index') }}">用户管理</a></li>
-                                {% endif %}
-                                
-                                {% if current_user.role.name == 'sudoer' %}
-                                <li><a href="{{ url_for('role.index') }}">角色管理</a></li>
-                                {% endif %}
-
-                                <li><a href="{{ url_for('user.logout') }}">退出</a></li>
-                            </ul>
-                         </li>
+                        <li><a href="{{ url_for('user.index')}}">用户列表</li>
                     </ul>
-                    <!-- <form class="navbar-form navbar-right">
-                        <input type="text" class="form-control" placeholder="Search...">
-                    </form> -->
                 </div>
             </div>
         </nav>
@@ -119,10 +57,6 @@
         </div>
     	<script type="text/javascript" src="{{ url_for('static', filename='js/jquery-1.11.3.min.js') }}"></script>
     	<script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='js/validator.min.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='js/masonry.pkgd.min.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='js/imagesloaded.pkgd.min.js') }}"></script>
-        <!-- <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.infinitescroll.min.js') }}"></script> -->
         {% block js %}{% endblock %}
     </body>
 </html>

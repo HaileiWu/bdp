@@ -14,6 +14,15 @@ from flask import current_app as app
 from flask.ext.paginate import Pagination
 from functools import wraps
 
+from bdp import mongo
+
+def to_int(num, default=1):
+	""" 转化为整形 """
+	try:
+		return int(num)
+	except Exception, e:
+		return default
+
 def check_auth(username, password):
 	""" 校验用户名和密码是否正确 """
 	return username == 'admin' and password == 'secret'
@@ -34,14 +43,30 @@ def requires_auth(f):
 		return f(*args, **kwargs)
 	return decorated
 
-page = Blueprint('page', __name__, template_folder='templates')
+page = Blueprint('user', __name__, template_folder='templates')
 
 @page.route('/users')
 @requires_auth
 def index():
 	limit = 100
 	page = to_int(request.args.get('page'))
-	users = app.db.users.find()
-	total = app.db.count()
+	users = mongo.db.users.find()
+	total = mongo.db.users.count()
 	pagination = Pagination(page=page, total=total, record_name='')
 	return render_template('users/index.html', users=users, pagination=pagination)
+
+@page.route('/user/new', methods=['GET'])
+@requires_auth
+def new():
+	user = {}
+
+
+@page.route('/users', methods=['POST'])
+@requires_auth
+def create():
+	pass
+
+@page.route('/user/update/<user_id>', methods=['POST'])
+@requires_auth
+def update(user_id):
+	pass
