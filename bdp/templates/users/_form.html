@@ -10,17 +10,17 @@
 		
 			<div class="form-group">
 				<label for="">UDID</label>
-				<input type="text" class="form-control" name="udid" placeholder="" value="{{ user.get('udid')}}" required>
+				<input type="text" class="form-control" name="udid" placeholder="" value="{{ user.get('udid', '')}}" required>
 			</div>
 
 			<div class="form-group">
 				<label for="">用户名</label>
-				<input type="text" class="form-control" name="username" placeholder="" value="{{ user.get('username')}}" required>
+				<input type="text" class="form-control" name="username" placeholder="" value="{{ user.get('username', '')}}" required>
 			</div>
 			
 			<div class="form-group">
 				<label for="">备注</label>
-				<input type="text" class="form-control" name="backup" placeholder="" value="{{ user.get('backup')}}" required>
+				<input type="text" class="form-control" name="backup" placeholder="" value="{{ user.get('backup', '')}}" required>
 			</div>
 
 			<button class="btn btn-primary" type="submit">提交</button>
