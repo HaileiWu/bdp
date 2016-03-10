@@ -7,7 +7,12 @@ import json
 import traceback
 import binascii
 
+from pymongo import MongoClient
 from crypt import AESC, RSAC, RNC
+
+client = MongoClient()
+
+db = client.bdp
 
 class AuthorizeServer(object):
     """ Use for authorize """
@@ -22,7 +27,7 @@ class AuthorizeServer(object):
         self.server.bind(server_address)
 
         # 要监听的连接数
-        self.server.listen(5)
+        self.server.listen(50)
 
         # 要读取的Sockets
         self.inputs = [ self.server ]
@@ -49,10 +54,16 @@ class AuthorizeServer(object):
         usr = data['usr']
         udid = data['udid']
         
+        user = db.users.find_one({'username': usr, 'udid': udid})
+
+        if user:
+            status = True 
+        else:
+            status = False
 
         # 2、查询mongo
-        response = 'this is response data.'
-        cipher_text = rnc.encrypt(response)
+        response = {'udid': udid, 'status': status}
+        cipher_text = rnc.encrypt(json.dumps(response))
         return cipher_text
 
 

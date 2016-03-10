@@ -1,5 +1,8 @@
 # encoding: utf-8
 
+from datetime import datetime
+from bson.objectid import ObjectId
+
 from flask import Blueprint
 from flask import render_template
 from flask import abort
@@ -13,6 +16,7 @@ from flask import jsonify
 from flask import current_app as app
 from flask.ext.paginate import Pagination
 from functools import wraps
+
 
 from bdp import mongo
 
@@ -59,14 +63,53 @@ def index():
 @requires_auth
 def new():
 	user = {}
+	return render_template('users/new.html', user=user)
 
 
 @page.route('/users', methods=['POST'])
 @requires_auth
 def create():
-	pass
+	form = request.form
+	username = form['username']
+	backup = form['backup']
+	udid = form['udid']
+	status = True
+	created_at = datetime.now()
+
+	user = {
+		'username': username,
+		'backup': backup,
+		'udid': udid,
+		'status': status,
+		'created_at': created_at,
+	}
+
+	user_id = mongo.db.users.insert_one(user).inserted_id
+
+	return redirect(url_for('user.index'))
 
 @page.route('/user/update/<user_id>', methods=['POST'])
 @requires_auth
 def update(user_id):
-	pass
+	form = request.form 
+	username = form['username']
+	backup = form['backup']
+	udid = form['udid']
+
+	user = {
+		'username': username,
+		'udid': udid,
+		'backup': backup,
+	}
+
+	result = mongo.db.users.update_one({'_id': ObjectId(user_id)}, {'$set': user})
+
+	return redirect(url_for('user.index'))
+
+@page.route('/user/edit/<user_id>', methods=['GET'])
+@requires_auth
+def edit(user_id):
+	print user_id
+	user = mongo.db.users.find_one({'_id': ObjectId(user_id)})
+
+	return render_template('users/edit.html', user=user)

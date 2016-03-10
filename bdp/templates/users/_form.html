@@ -2,19 +2,25 @@
 {% block body %}
 	<h4 class="page-header">{{ page_header }}</h4>
 	<div class="col-md-6">
-		{% if user.lc_user.id %}
-		<form action="{{ url_for('user.update', user_id=user.id) }}" method="POST">
+		{% if user._id %}
+		<form action="{{ url_for('user.update', user_id=user._id) }}" method="POST">
 		{% else %}
-		<form action="{{ url_for('user.create') }}" method="POST" data-toggle="validator">
+		<form action="{{ url_for('user.create') }}" method="POST">
 		{% endif %}
+		
+			<div class="form-group">
+				<label for="">UDID</label>
+				<input type="text" class="form-control" name="udid" placeholder="" value="{{ user.get('udid')}}" required>
+			</div>
+
 			<div class="form-group">
 				<label for="">用户名</label>
-				<input type="text" class="form-control" name="username" placeholder="" value="{{ user.username }}" required>
+				<input type="text" class="form-control" name="username" placeholder="" value="{{ user.get('username')}}" required>
 			</div>
 			
 			<div class="form-group">
-				<label for="">昵称</label>
-				<input type="text" class="form-control" name="nickname" placeholder="" value="{{ user.nickname }}" required>
+				<label for="">备注</label>
+				<input type="text" class="form-control" name="backup" placeholder="" value="{{ user.get('backup')}}" required>
 			</div>
 
 			<button class="btn btn-primary" type="submit">提交</button>

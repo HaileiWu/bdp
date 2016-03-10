@@ -6,9 +6,8 @@
 		<thead>
 			<tr>
 				<th></th>
+				<th>UDID</th>
 				<th>用户名</th>
-				<th>昵称</th>
-				<th>角色</th>
 				<th>状态</th>
 				<th>创建时间</th>
 				<th>操作</th>
@@ -18,11 +17,10 @@
 			{% for user in users %}
 				<tr>
 					<td>{{ loop.index }}</td>
+					<td>{{ user.get('udid') }}</td>
 					<td>{{ user.get('username') }}</td>
-					<td>{{ user.get('nickname') }}</td>
-					<td></td>
 					<td>
-						{% if user.get('enable') %}
+						{% if user.get('status') %}
 						可用
 						{% else %}
 						不可用
@@ -31,8 +29,8 @@
 					<td>{{ user.created_at.strftime("%Y-%m-%d %H:%M:%S") }}</td>
 					<td>
 						<!-- <a class="btn btn-primary btn-xs"></a> -->
-						<a class="btn btn-primary btn-xs" href="{{ url_for('user.edit', user_id=user.id) }}">编辑</a>
-						<a class="btn btn-danger btn-xs" href="{{ url_for('user.delete', user_id=user.id) }}">删除</a>
+						<a class="btn btn-primary btn-xs" href="{{ url_for('user.edit', user_id=user._id) }}">编辑</a>
+						
 					</td>
 				</tr>
 			{% endfor %}
