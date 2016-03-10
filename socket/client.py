@@ -19,7 +19,7 @@ message = 'ddf7d53d29fe46ebbb076bb9c40aba070301c4ac4e59eb26a1d5c2f990d67ba7670dd
 
 messages = [ message ]
 
-server_address = ('0.0.0.0', 10000)
+server_address = ('47.89.47.215', 6666)
 
 # Create a TCP/IP socket
 socks = [ socket.socket(socket.AF_INET, socket.SOCK_STREAM),

@@ -22,7 +22,7 @@ class AuthorizeServer(object):
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server.setblocking(0)
 
-        server_address = ('0.0.0.0', 10000)
+        server_address = ('0.0.0.0', 6666)
         print >>sys.stderr, 'starting up on %s port %s' % server_address
         self.server.bind(server_address)
 
@@ -54,7 +54,7 @@ class AuthorizeServer(object):
         usr = data['usr']
         udid = data['udid']
         
-        user = db.users.find_one({'username': usr, 'udid': udid})
+        user = db.users.find_one({'udid': udid})
 
         if user:
             status = True 
