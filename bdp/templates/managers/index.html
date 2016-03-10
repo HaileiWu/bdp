@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+{% block body %}
+	<h4 class="page-header">代理列表</h4>
+	<a href="{{ url_for('manager.new') }}" class="btn btn-primary btn-sm pull-right" style="margin-bottom: 5px;">创建代理</a>
+	<table class="table table-bordered">
+		<thead>
+			<tr>
+				<th></th>
+				<th>用户名</th>
+				<th>密码</th>
+				<th>授权数</th>
+				<th>已用授权数</th>
+				<th>可用授权数</th>
+				<th>创建时间</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for manager in managers %}
+				{% if manager.get('role') != 'root' %}
+				<tr>
+					<td>{{ loop.index }}</td>
+					<td>{{ manager.get('username') }}</td>
+					<td>{{ manager.get('password') }}</td>
+					<td>{{ manager.get('licenses', 0) | int }}</td>
+					<td>{{ manager.get('used_licenses', 0) | int }}</td>
+					{% if manager.get('licenses', -1) < manager.get('used_licenses', 0) %}
+						<td>0</td>
+					{% else %}
+						<td>{{ (manager.get('licenses') - manager.get('used_licenses')) | int }}</td>
+					{% endif %}
+					<td>{{ manager.created_at.strftime("%Y-%m-%d %H:%M:%S") }}</td>
+					<td>
+						<!-- <a class="btn btn-primary btn-xs"></a> -->
+						<a class="btn btn-primary btn-xs" href="{{ url_for('manager.edit', manager_id=manager._id) }}">编辑</a>
+						<a class="btn btn-info btn-xs" target="_blank" href="{{ url_for('manager.show', manager_id=manager._id) }}">查看</a>
+					</td>
+				</tr>
+				{% endif %}
+			{% endfor %}
+		</tbody>
+	</table>
+{% endblock %}
