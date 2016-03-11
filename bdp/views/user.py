@@ -2,6 +2,7 @@
 
 from datetime import datetime
 from bson.objectid import ObjectId
+from functools import wraps
 
 from flask import Blueprint
 from flask import render_template
@@ -15,7 +16,9 @@ from flask import json
 from flask import jsonify
 from flask import current_app as app
 from flask.ext.paginate import Pagination
-from functools import wraps
+
+from flask.ext.login import current_user
+from flask.ext.login import login_required
 
 
 from bdp import mongo
@@ -49,25 +52,34 @@ def requires_auth(f):
 
 page = Blueprint('user', __name__, template_folder='templates')
 
-@page.route('/users')
-@requires_auth
+
+
+@page.route('/')
+@login_required
 def index():
 	limit = 100
 	page = to_int(request.args.get('page'))
-	users = mongo.db.users.find()
+
+	if current_user.role != 'root':
+		created_by = current_user.id
+	else:
+		created_by = None
+
+	users = mongo.db.users.find({'created_by': created_by})
+
 	total = mongo.db.users.count()
 	pagination = Pagination(page=page, total=total, record_name='')
 	return render_template('users/index.html', users=users, pagination=pagination)
 
 @page.route('/user/new', methods=['GET'])
-@requires_auth
+@login_required
 def new():
 	user = {}
 	return render_template('users/new.html', user=user)
 
 
 @page.route('/users', methods=['POST'])
-@requires_auth
+@login_required
 def create():
 	form = request.form
 	username = form['username']
@@ -76,20 +88,37 @@ def create():
 	status = True
 	created_at = datetime.now()
 
+	if current_user.role != 'root':
+		created_by = current_user.id
+	else:
+		created_by = None
+
 	user = {
 		'username': username,
 		'backup': backup,
 		'udid': udid,
 		'status': status,
 		'created_at': created_at,
+		'created_by': created_by,
 	}
 
+	manager = mongo.db.managers.find_one({'username': current_user.id})
+
+	licenses = manager.get('licenses')
+	used_licenses = manager.get('used_licenses')
+
+	if licenses <= used_licenses:
+		flash('授权数不足，请联系管理员充值')
+		return redirect(url_for('user.index'))
+
 	user_id = mongo.db.users.insert_one(user).inserted_id
+
+	mongo.db.managers.update({'username': current_user.id}, {'$inc': {'used_licenses': 1}})
 
 	return redirect(url_for('user.index'))
 
 @page.route('/user/update/<user_id>', methods=['POST'])
-@requires_auth
+@login_required
 def update(user_id):
 	form = request.form 
 	username = form['username']
@@ -107,9 +136,8 @@ def update(user_id):
 	return redirect(url_for('user.index'))
 
 @page.route('/user/edit/<user_id>', methods=['GET'])
-@requires_auth
+@login_required
 def edit(user_id):
-	print user_id
 	user = mongo.db.users.find_one({'_id': ObjectId(user_id)})
 
 	return render_template('users/edit.html', user=user)

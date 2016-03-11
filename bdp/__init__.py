@@ -8,11 +8,22 @@ import glob
 from importlib import import_module
 from flask import Flask
 from flask import render_template
-
 from flask.ext.pymongo import PyMongo
+
+from flask.ext import login as flask_login
+
+reload(sys)
+sys.setdefaultencoding("utf-8")
 
 app = Flask(__name__, instance_relative_config=True)
 mongo = PyMongo(app)
+
+app.secret_key = 'boomshakala@hh,boomfucklak。。'
+
+login_manager = flask_login.LoginManager()
+login_manager.init_app(app)
+
+
 
 # 配置信息
 # app.config.from_object('camelia_backend.settings')
