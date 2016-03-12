@@ -160,3 +160,21 @@ def edit(user_id):
 	user = mongo.db.users.find_one({'_id': ObjectId(user_id)})
 
 	return render_template('users/edit.html', user=user)
+
+@page.route('/user/statistics', methods=['GET'])
+def statistics():
+	"""统计"""
+	total = mongo.db.users.count()
+
+	condition = [
+     	{ '$project': {'day': {'$dateToString': { 'format': "%Y-%m-%d", 'date': "$created_at" }}}},
+     	{ '$group': {'_id': "$day", 'number': {'$sum': 1 }}},
+   	]
+
+	result = mongo.db.users.aggregate(condition)
+
+	return render_template('users/statistics.html', total=total, result=result) 
+
+	
+
+

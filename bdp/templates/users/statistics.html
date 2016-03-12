@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block body %}
+	<h4 class="page-header">统计列表【总共{{ total }}】</h4>
+	<table class="table table-bordered">
+		<thead>
+			<tr>
+				<th></th>
+				<th>日期</th>
+				<th>授权数</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for statistics in result %}
+				<tr>
+					<td>{{ loop.index }}</td>
+					<td>{{ statistics.get('_id') }}</td>
+					<td>{{ statistics.get('number') }}</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+{% endblock %}
