@@ -20,6 +20,7 @@ from flask.ext.paginate import Pagination
 from flask.ext.login import current_user
 from flask.ext.login import login_required
 
+from pymongo.errors import DuplicateKeyError
 
 from bdp import mongo
 
@@ -81,59 +82,81 @@ def new():
 @page.route('/users', methods=['POST'])
 @login_required
 def create():
-	form = request.form
-	username = form['username']
-	backup = form['backup']
-	udid = form['udid']
-	status = True
-	created_at = datetime.now()
+	try:
+		form = request.form
+		username = form['username'].strip()
+		backup = form['backup']
+		status = form['status']
+		udid = form['udid'].strip()
+		created_at = datetime.now()
 
-	if current_user.role != 'root':
-		created_by = current_user.id
-	else:
-		created_by = None
+		if current_user.role != 'root':
+			created_by = current_user.id
+		else:
+			created_by = None
 
-	user = {
-		'username': username,
-		'backup': backup,
-		'udid': udid,
-		'status': status,
-		'created_at': created_at,
-		'created_by': created_by,
-	}
+		user = {
+			'username': username,
+			'backup': backup,
+			'udid': udid,
+			'status': status == 'true' and True or False,
+			'created_at': created_at,
+			'created_by': created_by,
+		}
 
-	manager = mongo.db.managers.find_one({'username': current_user.id})
+		manager = mongo.db.managers.find_one({'username': current_user.id})
 
-	licenses = manager.get('licenses')
-	used_licenses = manager.get('used_licenses')
+		if manager.get('enable') == False:
+			# 管理被禁用
+			flash('无操作权限')
+			return redirect(url_for('user.index'))
 
-	if licenses <= used_licenses:
-		flash('授权数不足，请联系管理员充值')
+		licenses = manager.get('licenses')
+		used_licenses = manager.get('used_licenses')
+
+		if licenses <= used_licenses:
+			flash('授权数不足，请联系管理员充值')
+			return redirect(url_for('user.index'))
+
+		user_id = mongo.db.users.insert_one(user).inserted_id
+
+		mongo.db.managers.update({'username': current_user.id}, {'$inc': {'used_licenses': 1}})
 		return redirect(url_for('user.index'))
+	except DuplicateKeyError:
+		flash('udid重复')
+		return redirect(url_for('user.index'))
+	except Exception, e:
+		flash(e)
+		return redirect(url_for('user.index'))
+		
 
-	user_id = mongo.db.users.insert_one(user).inserted_id
 
-	mongo.db.managers.update({'username': current_user.id}, {'$inc': {'used_licenses': 1}})
-
-	return redirect(url_for('user.index'))
+	
 
 @page.route('/user/update/<user_id>', methods=['POST'])
 @login_required
 def update(user_id):
-	form = request.form 
-	username = form['username']
-	backup = form['backup']
-	udid = form['udid']
+	try:
+		form = request.form 
+		username = form['username'].strip()
+		backup = form['backup']
+		status = form['status']
+		udid = form['udid'].strip()
 
-	user = {
-		'username': username,
-		'udid': udid,
-		'backup': backup,
-	}
+		user = {
+			'username': username,
+			'udid': udid,
+			'status': status == 'true' and True or False,
+			'backup': backup,
+		}
 
-	result = mongo.db.users.update_one({'_id': ObjectId(user_id)}, {'$set': user})
-
-	return redirect(url_for('user.index'))
+		result = mongo.db.users.update_one({'_id': ObjectId(user_id)}, {'$set': user})
+	except DuplicateKeyError:
+		flash('udid重复')
+	except Exception, e:
+		flash(e)
+	finally:
+		return redirect(url_for('user.index'))
 
 @page.route('/user/edit/<user_id>', methods=['GET'])
 @login_required

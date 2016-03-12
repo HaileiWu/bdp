@@ -11,6 +11,8 @@
 				<th>授权数</th>
 				<th>已用授权数</th>
 				<th>可用授权数</th>
+				<th>状态</th>
+				<th>备注</th>
 				<th>创建时间</th>
 				<th>操作</th>
 			</tr>
@@ -29,11 +31,14 @@
 					{% else %}
 						<td>{{ (manager.get('licenses') - manager.get('used_licenses')) | int }}</td>
 					{% endif %}
+					<td>{{ manager.enable == False and '不可用' or '可用' }}</td>
+					<td>{{ manager.get('backup', '') }}</td>
 					<td>{{ manager.created_at.strftime("%Y-%m-%d %H:%M:%S") }}</td>
 					<td>
 						<!-- <a class="btn btn-primary btn-xs"></a> -->
 						<a class="btn btn-primary btn-xs" href="{{ url_for('manager.edit', manager_id=manager._id) }}">编辑</a>
 						<a class="btn btn-info btn-xs" target="_blank" href="{{ url_for('manager.show', manager_id=manager._id) }}">查看</a>
+						<a class="btn btn-danger btn-xs" target="_blank" href="{{ url_for('manager.disable', manager_id=manager._id) }}">禁用</a>
 					</td>
 				</tr>
 				{% endif %}

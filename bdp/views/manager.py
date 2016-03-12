@@ -67,6 +67,11 @@ def login():
 	# 从数据库里获取用户信息
 	username = request.form['username']
 	manager = mongo.db.managers.find_one({'username': username})
+
+	if manager and manager.get('enable') == False:
+		flash('账户不可用')
+		return render_template('login.html')
+
 	# 验证密码是否正确
 	if manager and request.form['password'] == manager.get('password'):
 		user = User()
@@ -107,9 +112,10 @@ def new():
 @login_required
 def create():
 	form = request.form
-	username = form['username']
-	password = form['password']
+	username = form['username'].strip()
+	password = form['password'].strip()
 	backup = form['backup']
+	enable = form['enable']
 	licenses = to_int(form['licenses'])
 	created_at = datetime.now()
 
@@ -118,6 +124,7 @@ def create():
 		'password': password,
 		'backup': backup,
 		'licenses': licenses,
+		'enable': enable == 'true' and True or False,
 		'used_licenses': 0,
 		'role': 'agent',
 		'created_at': created_at,
@@ -131,9 +138,10 @@ def create():
 @login_required
 def update(manager_id):
 	form = request.form 
-	username = form['username']
-	password = form['password']
+	username = form['username'].strip()
+	password = form['password'].strip()
 	backup = form['backup']
+	enable = form['enable']
 	licenses = to_int(form['licenses'])
 
 	manager = {
@@ -141,6 +149,7 @@ def update(manager_id):
 		'password': password,
 		'backup': backup,
 		'licenses': licenses,
+		'enable': enable == 'true' and True or False,
 	}
 
 	result = mongo.db.managers.update_one({'_id': ObjectId(manager_id)}, {'$set': manager})
@@ -159,3 +168,8 @@ def show(manager_id):
 	manager = mongo.db.managers.find_one({'_id': ObjectId(manager_id)})
 	users = mongo.db.users.find({'created_by': manager.get('username')})
 	return render_template('managers/show.html', manager=manager, users=users)
+
+@page.route('/manager/disable/<manager_id>', methods=['GET'])
+def disable(manager_id):
+	result = mongo.db.managers.update_one({'_id': ObjectId(manager_id)}, {'$set': {'enable': False}})
+	return redirect(url_for('manager.index'))

@@ -24,6 +24,14 @@
 			</div>
 
 			<div class="form-group">
+                <label for="">状态</label>
+                <select name="enable" class="form-control">
+                    <option value="true">可用</option>
+                    <option value="false" {% if manager.get('enable') == False %} selected {% endif %}>不可用</option>
+    			</select>
+            </div>
+
+			<div class="form-group">
 				<label for="">备注</label>
 				<input type="text" class="form-control" name="backup" placeholder="" value="{{ manager.get('backup', '') }}">
 			</div>
