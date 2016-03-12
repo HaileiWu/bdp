@@ -56,10 +56,11 @@ class AuthorizeServer(object):
         
         user = db.users.find_one({'udid': udid})
 
-        if user:
-            status = True 
+
+        if user and user.get('status'):
+            status = 1 
         else:
-            status = False
+            status = 0
 
         # 2、查询mongo
         response = {'udid': udid, 'status': status}

@@ -129,10 +129,6 @@ def create():
 		flash(e)
 		return redirect(url_for('user.index'))
 		
-
-
-	
-
 @page.route('/user/update/<user_id>', methods=['POST'])
 @login_required
 def update(user_id):
