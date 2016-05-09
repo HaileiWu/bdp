@@ -60,17 +60,22 @@ page = Blueprint('user', __name__, template_folder='templates')
 def index():
 	limit = 100
 	page = to_int(request.args.get('page'))
+	_type = request.args.get('_type')
 
 	if current_user.role != 'root':
 		created_by = current_user.id
 	else:
 		created_by = None
-
-	users = mongo.db.users.find({'created_by': created_by})
+	if _type == 'siri':
+		users = mongo.db.users.find({'created_by': created_by, 'type': _type})
+	elif _type == 'voice':
+		users = mongo.db.users.find({'$and': [{'created_by': created_by}, {'$or': [{'type': None}, {'type': 'voice'}]}]})
+	else:
+		users = mongo.db.users.find({'created_by': created_by})
 
 	total = mongo.db.users.count()
 	pagination = Pagination(page=page, total=total, record_name='')
-	return render_template('users/index.html', users=users, pagination=pagination)
+	return render_template('users/index.html', users=users, pagination=pagination, _type=_type)
 
 @page.route('/user/new', methods=['GET'])
 @login_required
@@ -78,6 +83,25 @@ def new():
 	user = {}
 	return render_template('users/new.html', user=user)
 
+@page.route('/api/users', methods=['POST'])
+def multiple_create():
+	data = request.get_json()
+	users = data.get('users')
+
+	formatted_users = []
+	for user in users:
+		if user.get('type', '') == 'siri':
+			user['udid'] += '-W'
+		user['status'] = True
+		user['created_at'] = datetime.now()
+		user['created_by'] = None
+		formatted_users.append(user)
+	
+	mongo.db.users.insert(formatted_users)
+
+	return jsonify({'code': 200})
+
+	
 
 @page.route('/users', methods=['POST'])
 @login_required
@@ -87,6 +111,7 @@ def create():
 		username = form['username'].strip()
 		backup = form['backup']
 		status = form['status']
+		_type = form['type']
 		udid = form['udid'].strip()
 		created_at = datetime.now()
 
@@ -95,7 +120,11 @@ def create():
 		else:
 			created_by = None
 
+		if _type == 'siri':
+			udid = '%s-W' % udid
+
 		user = {
+			'type': _type,
 			'username': username,
 			'backup': backup,
 			'udid': udid,
@@ -134,12 +163,17 @@ def create():
 def update(user_id):
 	try:
 		form = request.form 
+		_type = form['type']
 		username = form['username'].strip()
 		backup = form['backup']
 		status = form['status']
 		udid = form['udid'].strip()
 
+		if _type == 'siri':
+			udid = '%s-W' % udid
+
 		user = {
+			'type': _type,
 			'username': username,
 			'udid': udid,
 			'status': status == 'true' and True or False,

@@ -1,13 +1,30 @@
 {% extends "layout.html" %}
 {% block body %}
-	<h4 class="page-header">用户列表</h4>
-	<a href="{{ url_for('user.new') }}" class="btn btn-primary btn-sm pull-right" style="margin-bottom: 5px;">创建用户</a>
+	<h4 class="page-header">{% if _type == 'voice' %} 【语音】 {% elif _type == 'siri' %} 【siri】{% else %} {% endif %}用户列表</h4>
+	<div class="row" style="margin-bottom: 5px;">
+		<div class="col-md-4">
+			<form class="form-inline">
+				<div class="form-group">
+					<select class="form-control" name="_type">
+						<option value="">选择类型</option>
+						<option value="voice" {% if request.args.get('_type', '') == 'voice' %} selected {% endif %}>语音</option>
+						<option value="siri" {% if request.args.get('_type', '') == 'siri' %} selected {% endif %}>siri</option>
+					</select>
+				</div>
+				<button type="submit" class="btn btn-sm btn-primary">搜索</button>
+			</form>
+		</div>
+		<div class="col-md-8">
+			<a href="{{ url_for('user.new') }}" class="btn btn-primary btn-sm pull-right" style="margin-bottom: 5px;">创建用户</a>
+		</div>
+	</div>
 	<table class="table table-bordered">
 		<thead>
 			<tr>
 				<th></th>
 				<th>UDID</th>
 				<th>用户名</th>
+				<th>类型</th>
 				<th>状态</th>
 				<th>创建时间</th>
 				<th>操作</th>
@@ -17,8 +34,9 @@
 			{% for user in users %}
 				<tr>
 					<td>{{ loop.index }}</td>
-					<td>{{ user.get('udid') }}</td>
+					<td>{{ user.get('udid', '').rsplit('-W', 1)[0] }}</td>
 					<td>{{ user.get('username') }}</td>
+					<td>{% if user.get('type') == 'voice' %} 语音 {% else %} siri {% endif %}</td>
 					<td>
 						{% if user.get('status') %}
 						可用

@@ -8,6 +8,7 @@
 				<th></th>
 				<th>UDID</th>
 				<th>用户名</th>
+				<th>类型</th>
 				<th>状态</th>
 				<th>创建时间</th>
 				<th>操作</th>
@@ -19,6 +20,7 @@
 					<td>{{ loop.index }}</td>
 					<td>{{ user.get('udid') }}</td>
 					<td>{{ user.get('username') }}</td>
+					<td>{% if user.get('type') == 'voice' %} 语音 {% else %} siri {% endif %}</td>
 					<td>
 						{% if user.get('status') %}
 						可用
