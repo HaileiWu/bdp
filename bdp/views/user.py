@@ -53,8 +53,6 @@ def requires_auth(f):
 
 page = Blueprint('user', __name__, template_folder='templates')
 
-
-
 @page.route('/')
 @login_required
 def index():
@@ -85,21 +83,21 @@ def new():
 
 @page.route('/api/users', methods=['POST'])
 def multiple_create():
-	data = request.get_json()
-	users = data.get('users')
-
-	formatted_users = []
-	for user in users:
-		if user.get('type', '') == 'siri':
-			user['udid'] += '-W'
-		user['status'] = True
-		user['created_at'] = datetime.now()
-		user['created_by'] = None
-		formatted_users.append(user)
-	
-	mongo.db.users.insert(formatted_users)
-
-	return jsonify({'code': 200})
+	try:
+		data = request.get_json()
+		users = data.get('users')
+		formatted_users = []
+		for user in users:
+			if user.get('type', '') == 'siri':
+				user['udid'] += '-W'
+			user['status'] = True
+			user['created_at'] = datetime.now()
+			user['created_by'] = None
+			formatted_users.append(user)
+		mongo.db.users.insert(formatted_users)
+		return jsonify({'code': 200})
+	except Exception, e:
+		return jsonify({'code': 500})
 
 	
 
