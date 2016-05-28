@@ -62,18 +62,23 @@ def index():
 
 	if current_user.role != 'root':
 		created_by = current_user.id
+		q = {'created_by': created_by}
+		current_mananger = mongo.db.managers.find_one({'username': current_user.id})
+		hint = '已使用语音授权：%s/%s，已使用siri授权：%s/%s' % \
+		(current_mananger['used_voice_licenses'], current_mananger['voice_licenses'],
+			current_mananger['used_siri_licenses'], current_mananger['siri_licenses'])
 	else:
+		q = {}
+		hint = ''
 		created_by = None
-	if _type == 'siri':
-		users = mongo.db.users.find({'created_by': created_by, 'type': _type})
-	elif _type == 'voice':
-		users = mongo.db.users.find({'$and': [{'created_by': created_by}, {'$or': [{'type': None}, {'type': 'voice'}]}]})
-	else:
-		users = mongo.db.users.find({'created_by': created_by})
 
-	total = mongo.db.users.count()
+	if _type:
+		q['type'] = _type
+
+	users = mongo.db.users.find(q)
+	total = mongo.db.users.count(q)
 	pagination = Pagination(page=page, total=total, record_name='')
-	return render_template('users/index.html', users=users, pagination=pagination, _type=_type)
+	return render_template('users/index.html', users=users, pagination=pagination, _type=_type, hint=hint)
 
 @page.route('/user/new', methods=['GET'])
 @login_required
@@ -198,7 +203,6 @@ def update(user_id):
 @login_required
 def edit(user_id):
 	user = mongo.db.users.find_one({'_id': ObjectId(user_id)})
-
 	return render_template('users/edit.html', user=user)
 
 @page.route('/user/delete/<user_id>', methods=['GET'])

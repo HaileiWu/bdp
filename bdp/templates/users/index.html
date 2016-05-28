@@ -1,6 +1,11 @@
 {% extends "layout.html" %}
 {% block body %}
 	<h4 class="page-header">{% if _type == 'voice' %} 【语音】 {% elif _type == 'siri' %} 【siri】{% else %} {% endif %}用户列表</h4>
+	{% if hint %}
+		<div class="alert alert-success" role="alert">
+			<a href="#" class="alert-link">{{ hint }}</a>
+		</div>
+	{% endif %}
 	<div class="row" style="margin-bottom: 5px;">
 		<div class="col-md-4">
 			<form class="form-inline">
@@ -26,6 +31,7 @@
 				<th>用户名</th>
 				<th>类型</th>
 				<th>状态</th>
+				<th>创建人</th>
 				<th>创建时间</th>
 				<th>操作</th>
 			</tr>
@@ -44,6 +50,7 @@
 						不可用
 						{% endif %}
 					</td>
+					<td>{{ user.get('created_by', '') }}</td>
 					<td>{{ user.created_at.strftime("%Y-%m-%d %H:%M:%S") }}</td>
 					<td>
 						<!-- <a class="btn btn-primary btn-xs"></a> -->

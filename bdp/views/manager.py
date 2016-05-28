@@ -213,3 +213,9 @@ def show(manager_id):
 def disable(manager_id):
 	result = mongo.db.managers.update_one({'_id': ObjectId(manager_id)}, {'$set': {'enable': False}})
 	return redirect(url_for('manager.index'))
+
+@page.route('/manager/delete/<manager_id>', methods=['GET'])
+def delete(manager_id):
+	mongo.db.managers.remove({'_id': ObjectId(manager_id)})
+	return redirect(url_for('manager.index'))
+
