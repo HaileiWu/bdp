@@ -131,14 +131,14 @@ def create():
 			siri_licenses = manager.get('siri_licenses')
 			used_siri_licenses = manager.get('used_siri_licenses')
 			if siri_licenses <= used_siri_licenses:
-				flash('siri授权数不足，请联系管理员充值')
+				flash('siri授权数不足')
 				return redirect(url_for('user.index'))
 			inc['used_siri_licenses'] = 1
 		else:
 			voice_licenses = manager.get('voice_licenses')
 			used_voice_licenses = manager.get('used_voice_licenses')
 			if voice_licenses <= used_voice_licenses:
-				flash('语音授权数不足，请联系管理员充值')
+				flash('语音授权数不足')
 				return redirect(url_for('user.index'))
 			inc['used_voice_licenses'] = 1
 
