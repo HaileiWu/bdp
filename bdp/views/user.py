@@ -75,7 +75,7 @@ def index():
 	if _type:
 		q['type'] = _type
 
-	users = mongo.db.users.find(q)
+	users = mongo.db.users.find(q).sort([('created_at', -1)])
 	total = mongo.db.users.count(q)
 	pagination = Pagination(page=page, total=total, record_name='')
 	return render_template('users/index.html', users=users, pagination=pagination, _type=_type, hint=hint)
