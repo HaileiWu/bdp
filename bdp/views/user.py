@@ -118,8 +118,29 @@ def create():
 		else:
 			created_by = None
 
+		manager = mongo.db.managers.find_one({'username': current_user.id})
+
+		if manager.get('enable') == False:
+			# 管理被禁用
+			flash('无操作权限')
+			return redirect(url_for('user.index'))
+			
+		inc = {'used_licenses': 1}
 		if _type == 'siri':
 			udid = '%s-W' % udid
+			siri_licenses = manager.get('siri_licenses')
+			used_siri_licenses = manager.get('used_siri_licenses')
+			if siri_licenses <= used_siri_licenses:
+				flash('siri授权数不足，请联系管理员充值')
+				return redirect(url_for('user.index'))
+			inc['used_siri_licenses'] = 1
+		else:
+			voice_licenses = manager.get('voice_licenses')
+			used_voice_licenses = manager.get('used_voice_licenses')
+			if voice_licenses <= used_voice_licenses:
+				flash('语音授权数不足，请联系管理员充值')
+				return redirect(url_for('user.index'))
+			inc['used_voice_licenses'] = 1
 
 		user = {
 			'type': _type,
@@ -131,23 +152,9 @@ def create():
 			'created_by': created_by,
 		}
 
-		manager = mongo.db.managers.find_one({'username': current_user.id})
-
-		if manager.get('enable') == False:
-			# 管理被禁用
-			flash('无操作权限')
-			return redirect(url_for('user.index'))
-
-		licenses = manager.get('licenses')
-		used_licenses = manager.get('used_licenses')
-
-		if licenses <= used_licenses:
-			flash('授权数不足，请联系管理员充值')
-			return redirect(url_for('user.index'))
-
 		user_id = mongo.db.users.insert_one(user).inserted_id
 
-		mongo.db.managers.update({'username': current_user.id}, {'$inc': {'used_licenses': 1}})
+		mongo.db.managers.update({'username': current_user.id}, {'$inc': inc})
 		return redirect(url_for('user.index'))
 	except DuplicateKeyError:
 		flash('udid重复')
@@ -192,6 +199,12 @@ def edit(user_id):
 	user = mongo.db.users.find_one({'_id': ObjectId(user_id)})
 
 	return render_template('users/edit.html', user=user)
+
+@page.route('/user/delete/<user_id>', methods=['GET'])
+@login_required
+def delete(user_id):
+	mongo.db.users.remove({'_id': ObjectId(user_id)})
+	return redirect(url_for('user.index'))
 
 @page.route('/user/statistics', methods=['GET'])
 def statistics():

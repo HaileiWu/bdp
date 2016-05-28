@@ -49,6 +49,7 @@
 						<!-- <a class="btn btn-primary btn-xs"></a> -->
 						{% if current_user.role == 'root' %}
 						<a class="btn btn-primary btn-xs" href="{{ url_for('user.edit', user_id=user._id) }}">编辑</a>
+						<a class="btn btn-danger btn-xs" href="{{ url_for('user.delete', user_id=user._id) }}">删除</a>
 						{% endif %}
 						
 					</td>

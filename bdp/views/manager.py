@@ -18,11 +18,12 @@ from flask import current_app as app
 from flask.ext.paginate import Pagination
 
 from flask.ext import login as flask_login
-from flask.ext.login import login_required
+from flask.ext.login import login_required, current_user
+
 
 from bdp import mongo, login_manager
 
-def to_int(num, default=1):
+def to_int(num, default=0):
 	""" 转化为整形 """
 	try:
 		return int(num)
@@ -90,14 +91,17 @@ def logout():
 	flask_login.logout_user()
 	return redirect(url_for('manager.login'))
 
-
 @page.route('/managers')
 @login_required
 def index():
 	limit = 100
-	page = to_int(request.args.get('page'))
-	managers = mongo.db.managers.find()
-	total = mongo.db.managers.count()
+	page = int(request.args.get('page', 1))
+	if current_user.role == 'root':
+		q = {}
+	else:
+		q = {'created_by': current_user.id}
+	managers = mongo.db.managers.find(q)
+	total = mongo.db.managers.count(q)
 	pagination = Pagination(page=page, total=total, record_name='')
 	return render_template('managers/index.html', managers=managers, pagination=pagination)
 
@@ -105,8 +109,14 @@ def index():
 @login_required
 def new():
 	manager = {}
-	return render_template('managers/new.html', manager=manager)
+	if current_user.role == 'agent':
+		current_mananger = mongo.db.managers.find_one({'username': current_user.id})
+		hint = '已使用语音授权：%s/%s，已使用siri授权：%s/%s' % \
+		(current_mananger['used_voice_licenses'], current_mananger['voice_licenses'],
+			current_mananger['used_siri_licenses'], current_mananger['siri_licenses'])
+		manager['hint'] = hint
 
+	return render_template('managers/new.html', manager=manager)
 
 @page.route('/managers', methods=['POST'])
 @login_required
@@ -116,21 +126,47 @@ def create():
 	password = form['password'].strip()
 	backup = form['backup']
 	enable = form['enable']
-	licenses = to_int(form['licenses'])
+	voice_licenses = to_int(form['voice_licenses'])
+	siri_licenses = to_int(form['siri_licenses'])
+	licenses = voice_licenses + siri_licenses
 	created_at = datetime.now()
+	role = 'agent'
+	if current_user.role == role:
+		role = 'sub-agent'
+		# 获取当前管理员数据
+		manager = mongo.db.managers.find_one({'username': current_user.id})
+		manager_voice_licenses =manager.get('voice_licenses')
+		manager_siri_licenses = manager.get('siri_licenses')
+		manager_used_voice_licenses = manager.get('used_voice_licenses')
+		manager_used_siri_licenses = manager.get('used_siri_licenses')
 
-	manager = {
+		if voice_licenses + manager_used_voice_licenses > manager_voice_licenses:
+			flash('语音授权超出可用值！')
+			return redirect(url_for('manager.index'))
+		if siri_licenses + manager_used_siri_licenses > manager_siri_licenses:
+			flash('siri授权超出可用值！')
+			return redirect(url_for('manager.index'))
+		
+		mongo.db.managers.update({'username': current_user.id}, {'$inc': {'used_licenses': voice_licenses+siri_licenses, 'used_voice_licenses': voice_licenses, 'used_siri_licenses': siri_licenses}})
+
+
+	data = {
 		'username': username,
 		'password': password,
 		'backup': backup,
 		'licenses': licenses,
+		'voice_licenses': voice_licenses,
+		'siri_licenses': siri_licenses,
 		'enable': enable == 'true' and True or False,
 		'used_licenses': 0,
-		'role': 'agent',
+		'used_voice_licenses': 0,
+		'used_siri_licenses': 0,
+		'role': role,
 		'created_at': created_at,
+		'created_by': current_user.id,
 	}
 
-	manager_id = mongo.db.managers.insert_one(manager).inserted_id
+	manager_id = mongo.db.managers.insert_one(data).inserted_id
 
 	return redirect(url_for('manager.index'))
 
@@ -142,12 +178,16 @@ def update(manager_id):
 	password = form['password'].strip()
 	backup = form['backup']
 	enable = form['enable']
-	licenses = to_int(form['licenses'])
+	voice_licenses = to_int(form['voice_licenses'])
+	siri_licenses = to_int(form['siri_licenses'])
+	licenses = voice_licenses + siri_licenses
 
 	manager = {
 		'username': username,
 		'password': password,
 		'backup': backup,
+		'voice_licenses': voice_licenses,
+		'siri_licenses': siri_licenses,
 		'licenses': licenses,
 		'enable': enable == 'true' and True or False,
 	}

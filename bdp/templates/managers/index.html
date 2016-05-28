@@ -11,6 +11,8 @@
 				<th>授权数</th>
 				<th>已用授权数</th>
 				<th>可用授权数</th>
+				<th>语音</th>
+				<th>siri</th>
 				<th>状态</th>
 				<th>备注</th>
 				<th>创建时间</th>
@@ -31,6 +33,8 @@
 					{% else %}
 						<td>{{ (manager.get('licenses') - manager.get('used_licenses')) | int }}</td>
 					{% endif %}
+					<td>{{ manager.get('voice_licenses', 0) }}</td>
+					<td>{{ manager.get('siri_licenses', 0) }}</td>
 					<td>{{ manager.enable == False and '不可用' or '可用' }}</td>
 					<td>{{ manager.get('backup', '') }}</td>
 					<td>{{ manager.created_at.strftime("%Y-%m-%d %H:%M:%S") }}</td>
