@@ -135,7 +135,7 @@ def create():
 	if current_user.role == 'agent':
 		# 获取当前管理员数据
 		manager = mongo.db.managers.find_one({'username': current_user.id})
-		manager_voice_licenses =manager.get('voice_licenses')
+		manager_voice_licenses = manager.get('voice_licenses')
 		manager_siri_licenses = manager.get('siri_licenses')
 		manager_used_voice_licenses = manager.get('used_voice_licenses')
 		manager_used_siri_licenses = manager.get('used_siri_licenses')
@@ -182,6 +182,24 @@ def update(manager_id):
 	voice_licenses = to_int(form['voice_licenses'])
 	siri_licenses = to_int(form['siri_licenses'])
 	licenses = voice_licenses + siri_licenses
+
+	if current_user.role == 'agent':
+		# 获取当前管理员数据
+		manager = mongo.db.managers.find_one({'username': current_user.id})
+		manager_voice_licenses = manager.get('voice_licenses')
+		manager_siri_licenses = manager.get('siri_licenses')
+		manager_used_voice_licenses = manager.get('used_voice_licenses')
+		manager_used_siri_licenses = manager.get('used_siri_licenses')
+
+		if voice_licenses + manager_used_voice_licenses > manager_voice_licenses:
+			flash('语音授权超出可用值！')
+			return redirect(url_for('manager.index'))
+		if siri_licenses + manager_used_siri_licenses > manager_siri_licenses:
+			flash('siri授权超出可用值！')
+			return redirect(url_for('manager.index'))
+		
+		mongo.db.managers.update({'username': current_user.id}, {'$inc': {'used_licenses': voice_licenses+siri_licenses, 'used_voice_licenses': voice_licenses, 'used_siri_licenses': siri_licenses}})
+
 
 	manager = {
 		'username': username,
