@@ -178,6 +178,7 @@ def update(manager_id):
 	password = form['password'].strip()
 	backup = form['backup']
 	enable = form['enable']
+	role = form.get('role', 'sub-agent')
 	voice_licenses = to_int(form['voice_licenses'])
 	siri_licenses = to_int(form['siri_licenses'])
 	licenses = voice_licenses + siri_licenses
@@ -186,6 +187,7 @@ def update(manager_id):
 		'username': username,
 		'password': password,
 		'backup': backup,
+		'role': role,
 		'voice_licenses': voice_licenses,
 		'siri_licenses': siri_licenses,
 		'licenses': licenses,
