@@ -126,13 +126,13 @@ def create():
 	password = form['password'].strip()
 	backup = form['backup']
 	enable = form['enable']
+	role = form.get('role', 'sub-agent')
 	voice_licenses = to_int(form['voice_licenses'])
 	siri_licenses = to_int(form['siri_licenses'])
 	licenses = voice_licenses + siri_licenses
 	created_at = datetime.now()
-	role = 'agent'
-	if current_user.role == role:
-		role = 'sub-agent'
+	
+	if current_user.role == 'agent':
 		# 获取当前管理员数据
 		manager = mongo.db.managers.find_one({'username': current_user.id})
 		manager_voice_licenses =manager.get('voice_licenses')

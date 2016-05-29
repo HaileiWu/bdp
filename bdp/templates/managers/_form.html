@@ -13,7 +13,17 @@
 		{% else %}
 		<form action="{{ url_for('manager.create') }}" method="POST">
 		{% endif %}
-		
+			{% if current_user.role == 'root' %}
+			<div class="form-group">
+				<label class="radio-inline">
+				  	<input type="radio" name="role" value="agent" {% if manager.get('role', 'agent') == 'agent' %} checked {% endif %}> 一级代理
+				</label>
+				<label class="radio-inline">
+				  	<input type="radio" name="role" value="sub-agent" {% if manager.get('role', 'agent') == 'sub-agent' %} checked {% endif %}> 二级代理
+				</label>
+			</div>
+			{% endif %}
+
 			<div class="form-group">
 				<label for="">用户名</label>
 				<input type="text" class="form-control" name="username" placeholder="" value="{{ manager.get('username', '') }}" required>

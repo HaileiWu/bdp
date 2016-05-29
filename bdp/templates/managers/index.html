@@ -6,6 +6,7 @@
 		<thead>
 			<tr>
 				<th></th>
+				<th>角色</th>
 				<th>用户名</th>
 				<th>密码</th>
 				<th>授权数</th>
@@ -24,6 +25,7 @@
 				{% if manager.get('role') != 'root' %}
 				<tr>
 					<td>{{ loop.index }}</td>
+					<td>{{ manager.get('role')}}</td>
 					<td>{{ manager.get('username') }}</td>
 					<td>{{ manager.get('password') }}</td>
 					<td>{{ manager.get('licenses', 0) | int }}</td>
