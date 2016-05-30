@@ -222,6 +222,7 @@ def statistics():
 	condition = [
      	{ '$project': {'day': {'$dateToString': { 'format': "%Y-%m-%d", 'date': "$created_at" }}}},
      	{ '$group': {'_id': "$day", 'number': {'$sum': 1 }}},
+     	{ '$sort': {'created_at': -1}},
    	]
 
 	result = mongo.db.users.aggregate(condition)
