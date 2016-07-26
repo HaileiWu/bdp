@@ -14,6 +14,7 @@
 						<option value="">选择类型</option>
 						<option value="voice" {% if request.args.get('_type', '') == 'voice' %} selected {% endif %}>语音</option>
 						<option value="siri" {% if request.args.get('_type', '') == 'siri' %} selected {% endif %}>siri</option>
+						<option value="anonymous" {% if request.args.get('_type', '') == 'anonymous' %} selected {% endif %}>anonymous</option>
 					</select>
 				</div>
 				<button type="submit" class="btn btn-sm btn-primary">搜索</button>
@@ -40,9 +41,9 @@
 			{% for user in users %}
 				<tr>
 					<td>{{ loop.index }}</td>
-					<td>{{ user.get('udid', '').rsplit('-W', 1)[0] }}</td>
+					<td>{{ user.get('udid', '').rsplit('-W', 1)[0].rsplit('-V', 1)[0] }}</td>
 					<td>{{ user.get('username') }}</td>
-					<td>{% if user.get('type') == 'voice' %} 语音 {% else %} siri {% endif %}</td>
+					<td>{% if user.get('type') == 'voice' %} 语音 {% elif user.get('type') == 'siri' %} siri {% else %} 匿名 {% endif %}</td>
 					<td>
 						{% if user.get('status') %}
 						可用

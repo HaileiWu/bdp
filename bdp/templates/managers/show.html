@@ -20,7 +20,7 @@
 					<td>{{ loop.index }}</td>
 					<td>{{ user.get('udid') }}</td>
 					<td>{{ user.get('username') }}</td>
-					<td>{% if user.get('type') == 'voice' %} 语音 {% else %} siri {% endif %}</td>
+					<td>{% if user.get('type') == 'voice' %} 语音 {% elif user.get('type') == 'siri' %} siri {% else %} 匿名 {% endif %}</td>
 					<td>
 						{% if user.get('status') %}
 						可用

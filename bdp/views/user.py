@@ -64,9 +64,10 @@ def index():
 		created_by = current_user.id
 		q = {'created_by': created_by}
 		current_mananger = mongo.db.managers.find_one({'username': current_user.id})
-		hint = '已使用语音授权：%s/%s，已使用siri授权：%s/%s' % \
+		hint = '已使用语音授权：%s/%s，已使用siri授权：%s/%s，已使用匿名授权：%s/%s' % \
 		(current_mananger['used_voice_licenses'], current_mananger['voice_licenses'],
-			current_mananger['used_siri_licenses'], current_mananger['siri_licenses'])
+			current_mananger['used_siri_licenses'], current_mananger['siri_licenses'],
+			current_mananger.get('used_anonymous_licenses', 0), current_mananger.get('anonymous_licenses',0),)
 	else:
 		q = {}
 		hint = ''
@@ -95,6 +96,8 @@ def multiple_create():
 		for user in users:
 			if user.get('type', '') == 'siri':
 				user['udid'] += '-W'
+			elif user.get('type', '') == 'anonymous':
+				user['udid'] += '-V'
 			user['status'] = True
 			user['created_at'] = datetime.now()
 			user['created_by'] = None
@@ -141,6 +144,15 @@ def create():
 					flash('siri授权数不足')
 					return redirect(url_for('user.index'))
 				inc['used_siri_licenses'] = 1
+		elif _type == 'anonymous':
+			udid = '%s-V' % udid
+			if manager.get('role') != 'root':
+				anonymous_licenses = manager.get('anonymous_licenses')
+				used_anonymous_licenses = manager.get('used_anonymous_licenses')
+				if anonymous_licenses <= used_anonymous_licenses:
+					flash('匿名授权数不足')
+					return redirect(url_for('user.index'))
+				inc['used_anonymous_licenses'] = 1
 		else:
 			if manager.get('role') != 'root':
 				voice_licenses = manager.get('voice_licenses')
@@ -185,6 +197,8 @@ def update(user_id):
 
 		if _type == 'siri':
 			udid = '%s-W' % udid
+		elif _type == 'anonymous':
+			udid = '%s-V' % udid
 
 		user = {
 			'type': _type,

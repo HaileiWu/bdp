@@ -14,10 +14,13 @@
 				<label class="radio-inline">
 				  	<input type="radio" name="type" value="siri" {% if user.get('type', 'voice') == 'siri' %} checked {% endif %}> siri
 				</label>
+				<label class="radio-inline">
+				  	<input type="radio" name="type" value="anonymous" {% if user.get('type', 'voice') == 'anonymous' %} checked {% endif %}> 匿名
+				</label>
 			</div>
 			<div class="form-group">
 				<label for="">UDID</label>
-				<input type="text" class="form-control" name="udid" placeholder="" value="{{ user.get('udid', '').rsplit('-W', 1)[0]}}" required>
+				<input type="text" class="form-control" name="udid" placeholder="" value="{{ user.get('udid', '').rsplit('-W', 1)[0].rsplit('-V', 1)[0]}}" required>
 			</div>
 
 			<div class="form-group">

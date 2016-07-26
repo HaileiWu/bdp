@@ -45,6 +45,11 @@
 			</div>
 
 			<div class="form-group">
+				<label for="">匿名授权数</label>
+				<input type="text" class="form-control" name="anonymous_licenses" placeholder="" value="{{ manager.get('anonymous_licenses', '') }}">
+			</div>
+
+			<div class="form-group">
                 <label for="">状态</label>
                 <select name="enable" class="form-control">
                     <option value="true">可用</option>

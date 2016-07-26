@@ -22,8 +22,8 @@ app.secret_key = 'boomshakala@hh,boomfucklak。。'
 
 login_manager = flask_login.LoginManager()
 login_manager.init_app(app)
-
-
+login_manager.login_view = "manager.login"
+login_manager.login_message = '登录进入系统...'
 
 # 配置信息
 # app.config.from_object('camelia_backend.settings')
