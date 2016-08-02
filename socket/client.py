@@ -25,7 +25,7 @@ server_address = ('127.0.0.1', 6666)
 
 # Create a TCP/IP socket
 socks = [ socket.socket(socket.AF_INET, socket.SOCK_STREAM),
-          socket.socket(socket.AF_INET, socket.SOCK_STREAM),
+          # socket.socket(socket.AF_INET, socket.SOCK_STREAM),
           ]
 
 # Connect the socket to the port where the server is listening

@@ -1,3 +1,6 @@
 flask
 Flask-PyMongo
 flask-paginate
+zmq
+rsa
+pycrypto
