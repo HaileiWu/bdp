@@ -21,11 +21,14 @@ messages = [ message ]
 
 # 47.89.47.215
 
-server_address = ('127.0.0.1', 6666)
+# server_address = ('127.0.0.1', 6666)
+
+server_address = ('47.89.47.215', 6667)
+
 
 # Create a TCP/IP socket
 socks = [ socket.socket(socket.AF_INET, socket.SOCK_STREAM),
-          # socket.socket(socket.AF_INET, socket.SOCK_STREAM),
+          socket.socket(socket.AF_INET, socket.SOCK_STREAM),
           ]
 
 # Connect the socket to the port where the server is listening

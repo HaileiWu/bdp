@@ -4,3 +4,5 @@ flask-paginate
 zmq
 rsa
 pycrypto
+gevent
+

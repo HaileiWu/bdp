@@ -13,10 +13,11 @@ client = MongoClient()
 
 db = client.bdp
 
-def init_global_connect():
+context = zmq.Context()
+socket = context.socket(zmq.REQ)
+
+def init_connect():
     """ 初始化连接 """
-    context = zmq.Context()
-    socket = context.socket(zmq.REQ)
     for address in server_addresses:
         socket.connect(address)
     return socket
@@ -26,6 +27,7 @@ balance = init_global_connect()
 def distribute_handler(socket, address):
     try:
         data = socket.recv(1024)
+        balance = init_connect()
         balance.send(data)
         cipher_text = balance.recv()
         socket.send(cipher_text)
