@@ -2,7 +2,7 @@
 import json
 import traceback
 import binascii
-from gevent_zeromq import zmq
+import zmq.green as zmq
 
 from gevent.server import StreamServer
 from pymongo import MongoClient
@@ -73,7 +73,7 @@ def handle(socket, address):
         socket.close()
     
 
-server_address = ('0.0.0.0', 6666)
+server_address = ('0.0.0.0', 6667)
 server = StreamServer(server_address, distribute_handler)
 server.serve_forever()
 
