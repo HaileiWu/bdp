@@ -22,8 +22,6 @@ def connect():
         socket.connect(address)
     return socket
 
-balance = init_global_connect()
-
 def distribute_handler(socket, address):
     try:
         data = socket.recv(1024)
