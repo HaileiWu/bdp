@@ -2,7 +2,7 @@
 import json
 import traceback
 import binascii
-import zmq
+from gevent_zeromq import zmq
 
 from gevent.server import StreamServer
 from pymongo import MongoClient
@@ -16,7 +16,7 @@ db = client.bdp
 context = zmq.Context()
 socket = context.socket(zmq.REQ)
 
-def init_connect():
+def connect():
     """ 初始化连接 """
     for address in server_addresses:
         socket.connect(address)
@@ -27,7 +27,7 @@ balance = init_global_connect()
 def distribute_handler(socket, address):
     try:
         data = socket.recv(1024)
-        balance = init_connect()
+        balance = connect()
         balance.send(data)
         cipher_text = balance.recv()
         socket.send(cipher_text)

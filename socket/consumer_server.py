@@ -3,7 +3,8 @@ import sys
 import json
 import traceback
 import binascii
-import zmq
+import gevent
+from gevent_zeromq import zmq
 
 from gevent.server import StreamServer
 from pymongo import MongoClient
@@ -15,41 +16,44 @@ port = "6666"
 if len(sys.argv) > 1:
     port = sys.argv[1]
 
-context = zmq.Context()
-socket = context.socket(zmq.REP)
-socket.bind('tcp://*:%s' % port)
-
 client = MongoClient(mongo_url)
 db = client.bdp
+context = zmq.Context()
 
-while True:
-    try:
-        data = socket.recv(1024)
-        key = binascii.b2a_hex(data[0:16]).upper()
+def server():
+    socket = context.socket(zmq.REP)
+    socket.bind('tcp://*:%s' % port)
 
-        body = data[16:]
+    while True:
+        try:
+            data = socket.recv(1024)
+            key = binascii.b2a_hex(data[0:16]).upper()
 
-        # RN解密
-        rnc = RNC(key)
-        data = rnc.decrypt(body)
+            body = data[16:]
 
-        data = json.loads(data)
-        
-        usr = data['usr']
-        udid = data['udid']
-        
-        print 'request from %s' % usr
+            # RN解密
+            rnc = RNC(key)
+            data = rnc.decrypt(body)
 
-        user = db.users.find_one({'udid': udid})
+            data = json.loads(data)
+            
+            usr = data['usr']
+            udid = data['udid']
+            
+            print 'request from %s' % usr
 
-        if user and user.get('status'):
-            status = 1 
-        else:
-            status = 0
+            user = db.users.find_one({'udid': udid})
 
-        # 2、查询mongo
-        response = {'udid': udid, 'status': status}
-        cipher_text = rnc.encrypt(json.dumps(response))
-        socket.send(cipher_text)
-    except Exception, e:
-    	pass
+            if user and user.get('status'):
+                status = 1 
+            else:
+                status = 0
+
+            # 2、查询mongo
+            response = {'udid': udid, 'status': status}
+            cipher_text = rnc.encrypt(json.dumps(response))
+            socket.send(cipher_text)
+        except Exception, e:
+        	print e
+
+gevent.joinall([gevent.spawn(server)])

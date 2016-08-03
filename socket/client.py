@@ -1,6 +1,7 @@
 import socket
 import sys
 import json
+import time
 
 from crypt import RSAC, AESC, RNC
 
@@ -31,26 +32,35 @@ socks = [ socket.socket(socket.AF_INET, socket.SOCK_STREAM),
           socket.socket(socket.AF_INET, socket.SOCK_STREAM),
           ]
 
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect(server_address)
+while True:
+    message = messages[0]
+    s.send(message)
+    data = s.recv(1024)
+    print  data
+    # print rnc.decrypt(data)
+    
 # Connect the socket to the port where the server is listening
-print >>sys.stderr, 'connecting to %s port %s' % server_address
-for s in socks:
-    s.connect(server_address)
+# print >>sys.stderr, 'connecting to %s port %s' % server_address
+# for s in socks:
+#     s.connect(server_address)
 
 
-for message in messages:
+# for message in messages:
 
-    # Send messages on both sockets
-    for s in socks:
-        print >>sys.stderr, '%s: sending "%s"' % (s.getsockname(), message)
-        s.send(message)
+#     # Send messages on both sockets
+#     for s in socks:
+#         print >>sys.stderr, '%s: sending "%s"' % (s.getsockname(), message)
+#         s.send(message)
 
-    # Read responses on both sockets
-    for s in socks:
-        data = s.recv(1024)
-        print rnc.decrypt(data)
-        print >>sys.stderr, '%s: received "%s"' % (s.getsockname(), data)
-        if not data:
-            print >>sys.stderr, 'closing socket', s.getsockname()
-            s.close()
+#     # Read responses on both sockets
+#     for s in socks:
+#         data = s.recv(1024)
+#         print rnc.decrypt(data)
+#         print >>sys.stderr, '%s: received "%s"' % (s.getsockname(), data)
+#         if not data:
+#             print >>sys.stderr, 'closing socket', s.getsockname()
+#             s.close()
 
 
