@@ -6,4 +6,3 @@ rsa
 pycrypto
 gevent
 pyzmq
-gevent_zeromq

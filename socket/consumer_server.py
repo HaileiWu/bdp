@@ -4,7 +4,7 @@ import json
 import traceback
 import binascii
 import gevent
-from gevent_zeromq import zmq
+import zmq.green as zmq
 
 from gevent.server import StreamServer
 from pymongo import MongoClient
