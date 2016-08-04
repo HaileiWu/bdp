@@ -14,10 +14,10 @@ client = MongoClient()
 db = client.bdp
 
 context = zmq.Context()
-socket = context.socket(zmq.REQ)
 
 def connect():
     """ 初始化连接 """
+    socket = context.socket(zmq.REQ)
     for address in server_addresses:
         socket.connect(address)
     return socket
@@ -32,6 +32,7 @@ def distribute_handler(socket, address):
     except Exception, e:
         pass
     finally:
+        balance.close()
         socket.close()
 
 def handle(socket, address):

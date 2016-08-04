@@ -15,7 +15,7 @@ from flask import url_for
 from flask import json
 from flask import jsonify
 from flask import current_app as app
-from flask.ext.paginate import Pagination
+from flask_paginate import Pagination
 
 from flask.ext.login import current_user
 from flask.ext.login import login_required
@@ -76,9 +76,9 @@ def index():
 	if _type:
 		q['type'] = _type
 
-	users = mongo.db.users.find(q).sort([('created_at', -1)])
+	users = mongo.db.users.find(q).sort([('created_at', -1)]).skip(limit*(page-1)).limit(limit)
 	total = mongo.db.users.count(q)
-	pagination = Pagination(page=page, total=total, record_name='')
+	pagination = Pagination(page=page, per_page=limit, total=total, record_name='users')
 	return render_template('users/index.html', users=users, pagination=pagination, _type=_type, hint=hint)
 
 @page.route('/user/new', methods=['GET'])
