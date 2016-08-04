@@ -3,6 +3,7 @@ from gevent.server import StreamServer
 import json
 import traceback
 import binascii
+import time
 
 from pymongo import MongoClient
 from crypt import AESC, RSAC, RNC
@@ -29,8 +30,8 @@ def handle(socket, address):
         usr = data['usr']
         udid = data['udid']
         
-        print 'request from %s' % usr
-
+        #print 'request from %s' % usr
+        
         user = db.users.find_one({'udid': udid})
 
         if user and user.get('status'):
@@ -42,6 +43,7 @@ def handle(socket, address):
         response = {'udid': udid, 'status': status}
         cipher_text = rnc.encrypt(json.dumps(response))
         socket.send(cipher_text)
+        time.sleep(0.1)
     except Exception, e:
     	pass
     finally:
