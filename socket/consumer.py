@@ -93,6 +93,7 @@ class RequestHandler(SocketServer.BaseRequestHandler):
 
         except Exception, e:
             print e
+            print self.request.send('')
 
 class Server(SocketServer.TCPServer):
     pass
