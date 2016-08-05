@@ -24,9 +24,9 @@ messages = [ message ]
 
 # 47.89.47.215
 
-server_address = ('127.0.0.1', 6666)
+# server_address = ('127.0.0.1', 6666)
 
-# server_address = ('47.89.47.215', 6667)
+server_address = ('47.89.47.215', 6667)
 
 
 # Create a TCP/IP socket
@@ -37,11 +37,11 @@ socks = [ socket.socket(socket.AF_INET, socket.SOCK_STREAM),
 context = zmq.Context()
 
 while True:
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect(server_address)
+    # s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # s.connect(server_address)
 
-    # s = context.socket(zmq.REQ)
-    # s.connect('tcp://127.0.0.1:6666')
+    s = context.socket(zmq.REQ)
+    s.connect('tcp://47.89.47.215:6669')
 
     message = messages[0]
     s.send(message)

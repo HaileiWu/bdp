@@ -17,11 +17,11 @@ port = "6666"
 if len(sys.argv) > 1:
     port = sys.argv[1]
 
-client = MongoClient(mongo_url)
-db = client.bdp
 context = zmq.Context()
 
 def server(port=port):
+    client = MongoClient(mongo_url)
+    db = client.bdp
     socket = context.socket(zmq.REP)
     socket.bind('tcp://*:%s' % port)
     print 'running server on port: %s' % port
