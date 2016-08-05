@@ -1,4 +1,6 @@
 # encoding: utf-8
+from gevent import monkey
+monkey.patch_socket()
 import socket
 import json
 import traceback
@@ -81,7 +83,7 @@ def handle(socket, address):
     
 
 server_address = ('0.0.0.0', 6666)
-server = StreamServer(server_address, distribute_handler)
+server = StreamServer(server_address, distribute_handler, spawn=10000)
 server.serve_forever()
 
 # for request in range(1, 10):
