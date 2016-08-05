@@ -1,6 +1,7 @@
 # encoding: utf-8
 import json
 import traceback
+import random
 import binascii
 import zmq.green as zmq
 
@@ -18,10 +19,13 @@ context = zmq.Context()
 def connect():
     """ 初始化连接 """
     socket = context.socket(zmq.REQ)
-    for address in server_addresses:
-        socket.connect(address)
-        print address
+    # for address in server_addresses:
+    #     socket.connect(address)
+    #     print address
+    address = random.choice(server_addresses)
+    socket.connect(address)
     return socket
+
 
 def distribute_handler(socket, address):
     try:

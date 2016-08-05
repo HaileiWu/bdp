@@ -24,9 +24,9 @@ messages = [ message ]
 
 # 47.89.47.215
 
-# server_address = ('127.0.0.1', 6666)
+server_address = ('127.0.0.1', 6666)
 
-server_address = ('47.89.47.215', 6667)
+# server_address = ('47.89.47.215', 5555)
 
 
 # Create a TCP/IP socket
