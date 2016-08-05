@@ -59,9 +59,13 @@ def server(port=port):
         	print e
 
 
-if __name__ == '__main__':
-    server_ports = range(6668, 6671)
-    for server_port in server_ports:
-        Process(target=server, args=(server_port,)).start()
+
+
+
+
+# if __name__ == '__main__':
+#     server_ports = range(6668, 6671)
+#     for server_port in server_ports:
+#         Process(target=server, args=(server_port,)).start()
 
 # gevent.joinall([gevent.spawn(server)])

@@ -1,4 +1,5 @@
 # encoding: utf-8
+import socket
 import json
 import traceback
 import random
@@ -11,21 +12,22 @@ from pymongo import MongoClient
 from crypt import AESC, RSAC, RNC
 from config import server_addresses
 
-client = MongoClient()
+# client = MongoClient()
 
-db = client.bdp
+# db = client.bdp
 
-context = zmq.Context()
+# context = zmq.Context()
 
 def connect():
     """ 初始化连接 """
-    socket = context.socket(zmq.REQ)
+    # socket = context.socket(zmq.REQ)
     # for address in server_addresses:
     #     socket.connect(address)
     #     print address
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     address = random.choice(server_addresses)
-    socket.connect(address)
-    return socket
+    s.connect(address)
+    return s
 
 
 def distribute_handler(socket, address):
@@ -33,12 +35,12 @@ def distribute_handler(socket, address):
         data = socket.recv(1024)
         balance = connect()
         balance.send(data)
-        cipher_text = balance.recv()
+        cipher_text = balance.recv(1024)
+        balance.close()
         socket.send(cipher_text)
     except Exception, e:
         pass
     finally:
-        balance.close()
         socket.close()
 
 def handle(socket, address):
