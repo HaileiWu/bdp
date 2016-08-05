@@ -77,7 +77,7 @@ class RequestHandler(SocketServer.BaseRequestHandler):
             usr = data['usr']
             udid = data['udid']
             
-            #print 'request from %s' % usr
+            print 'request from %s' % usr
             
             user = db.users.find_one({'udid': udid})
 
