@@ -23,7 +23,7 @@ def server(port=port):
     client = MongoClient(mongo_url)
     db = client.bdp
     socket = context.socket(zmq.REP)
-    socket.bind('tcp://*:%s' % port)
+    socket.bind('tcp://127.0.0.1:%s' % port)
     print 'running server on port: %s' % port
     while True:
         try:
