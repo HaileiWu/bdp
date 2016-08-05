@@ -92,7 +92,7 @@ class RequestHandler(SocketServer.BaseRequestHandler):
             self.request.send(cipher_text)
 
         except Exception, e:
-            print e
+            print traceback.format_exc()
             print self.request.send('')
 
 class Server(SocketServer.TCPServer):
