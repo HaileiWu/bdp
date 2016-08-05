@@ -99,11 +99,11 @@ class Server(SocketServer.TCPServer):
     
 
 server_address = ('0.0.0.0', port)
-server = StreamServer(server_address, handle)
-server.serve_forever()
-
-# server = Server(server_address, RequestHandler)
+# server = StreamServer(server_address, handle)
 # server.serve_forever()
+
+server = Server(server_address, RequestHandler)
+server.serve_forever()
 
 
 
