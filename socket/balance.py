@@ -3,7 +3,8 @@ import json
 import traceback
 import random
 import binascii
-import zmq.green as zmq
+# import zmq.green as zmq
+import zmq
 
 from gevent.server import StreamServer
 from pymongo import MongoClient
