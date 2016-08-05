@@ -20,6 +20,7 @@ def connect():
     socket = context.socket(zmq.REQ)
     for address in server_addresses:
         socket.connect(address)
+        print address
     return socket
 
 def distribute_handler(socket, address):
@@ -72,7 +73,7 @@ def handle(socket, address):
         socket.close()
     
 
-server_address = ('0.0.0.0', 6667)
+server_address = ('0.0.0.0', 6666)
 server = StreamServer(server_address, distribute_handler)
 server.serve_forever()
 

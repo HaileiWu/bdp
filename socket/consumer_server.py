@@ -3,6 +3,7 @@ import sys
 import json
 import traceback
 import binascii
+from  multiprocessing import Process
 import gevent
 import zmq.green as zmq
 
@@ -20,10 +21,10 @@ client = MongoClient(mongo_url)
 db = client.bdp
 context = zmq.Context()
 
-def server():
+def server(port=port):
     socket = context.socket(zmq.REP)
     socket.bind('tcp://*:%s' % port)
-
+    print 'running server on port: %s' % port
     while True:
         try:
             data = socket.recv(1024)
@@ -40,7 +41,7 @@ def server():
             usr = data['usr']
             udid = data['udid']
             
-            print 'request from %s' % usr
+            print '%s: request from %s' % (port, usr)
 
             user = db.users.find_one({'udid': udid})
 
@@ -56,4 +57,9 @@ def server():
         except Exception, e:
         	print e
 
-gevent.joinall([gevent.spawn(server)])
+if __name__ == '__main__':
+    server_ports = range(6668, 6671)
+    for server_port in server_ports:
+        Process(target=server, args=(server_port,)).start()
+
+# gevent.joinall([gevent.spawn(server)])
