@@ -42,7 +42,7 @@
 					<td>{{ manager.enable == False and '不可用' or '可用' }}</td>
 					<td>{{ manager.get('backup', '') }}</td>
 					<td>{{ manager.get('created_by', '') }}</td>
-					<!-- <td>{{ manager.created_at.strftime("%Y-%m-%d %H:%M:%S") }}</td> -->
+					
 					<td>
 						<!-- <a class="btn btn-primary btn-xs"></a> -->
 						<a class="btn btn-primary btn-xs" href="{{ url_for('manager.edit', manager_id=manager._id) }}">编辑</a>

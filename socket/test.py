@@ -1,0 +1,31 @@
+# encoding: utf-8
+from gevent.server import StreamServer
+import json
+import traceback
+import binascii
+import time
+
+from crypt import AESC, RSAC, RNC
+
+data = 'ddf7d53d29fe46ebbb076bb9c40aba070301c4ac4e59eb26a1d5c2f990d67ba7670dd4fa8e1a155687c1685736b97d061e71dacb9eaa6fc1846de05bca1c8e431b3bd29364ba8767be26a4ce7304832d9e30eecf075b88687ad97b7fa529ed1f9c28d2bf8aef18c795e9fbbd222a671e524ec70f7e5b056bb003cc07e123d89ce561d32c2e5ab133c105d67ace198cd4b60cbaf7fba283579025f0bb971c8dcfe3cd'.decode('hex')
+
+data = 'DDF7D53D29FE46EBBB076BB9C40ABA07'.lower() + '0301e16e6023dc06c6a84abf406cedf3288a21d5ec805642a93624620f471f38b51297613e5c4c8dd5bc847bb578696399e5ffc8db662c4f5802eca1bfd93d967f0757ec024ac395869694eabed859aa2e7a317718f7859f00797633a9a287e179e5e7ce79146a85041774506da707f8877d7ed921c951f9fb1157e7aa471a84d373109b7532c768ce73fdb6f587ae372e05'
+
+key = binascii.b2a_hex(data[0:16]).upper()
+
+body = data[16:]
+
+key = 'DDF7D53D29FE46EBBB076BB9C40ABA07'
+body = '0301e16e6023dc06c6a84abf406cedf3288a21d5ec805642a93624620f471f38b51297613e5c4c8dd5bc847bb578696399e5ffc8db662c4f5802eca1bfd93d967f0757ec024ac395869694eabed859aa2e7a317718f7859f00797633a9a287e179e5e7ce79146a85041774506da707f8877d7ed921c951f9fb1157e7aa471a84d373109b7532c768ce73fdb6f587ae372e05'.decode('hex')
+
+# RN解密
+rnc = RNC(key)
+data = rnc.decrypt(body)
+
+data = json.loads(data)
+
+print data
+        
+
+
+
